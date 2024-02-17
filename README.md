@@ -1,1 +1,1 @@
-# 4-Year-Plan-Gen
+# Undergraduate Schedule Generator
