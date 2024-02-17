@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-SchedGenApplication<sched_gen>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.umd.sched_gen.SchedGenApplication",
+            "projectName": "sched_gen",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
