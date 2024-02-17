@@ -8,6 +8,6 @@ public class SchedGenApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SchedGenApplication.class, args);
-		
+		System.out.println("Hello");
 	}
 }
