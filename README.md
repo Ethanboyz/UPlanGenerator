@@ -1,4 +1,4 @@
-## Undergraduate Schedule Generator
+## UPlan Generator
 ### General
 UnSchedule Generator is a UMD undergraduate schedule generator designed to help students find an optimal path towards graduation from
 day of enrollment.
