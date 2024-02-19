@@ -9,6 +9,16 @@
             "projectName": "sched_gen",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-App<sched_gen>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.umd.sched_gen.App",
+            "projectName": "sched_gen",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
