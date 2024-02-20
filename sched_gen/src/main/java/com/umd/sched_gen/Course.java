@@ -4,6 +4,7 @@ package com.umd.sched_gen;
 import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -13,12 +14,20 @@ public class Course {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "course_id", updatable = false, nullable = false)
-    private UUID courseId;
-    private String id;
+    @Column(name = "ID", updatable = false, nullable = false)
+    private UUID id;
 
     /* Identifying factors of a course */
-    private String department;
+    @Column(name = "Course")
+    @JsonProperty("course_id")
+    private String courseId;
+
+    @Column(name = "Course Name")
+    private String name;
+
+    @Column(name = "Department")
+    @JsonProperty("dept_id")
+    private String deptId;
 
     /* info about the course */
     /*private float averageGPA; */
@@ -38,17 +47,25 @@ public class Course {
     protected Course() {}
 
     /* Only info needed to retrieve a course's info is its id */
-    public Course(String id) {
+    public Course(UUID id) {
         this.id = id;
     }
 
     /* Getters */
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDeptId() {
+        return deptId;
     }
 
     /*public float getAverageGPA() {
@@ -81,12 +98,20 @@ public class Course {
     } */
 
     /* Setters */
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDeptId(String deptId) {
+        this.deptId = deptId;
     }
 
     /* public void setAverageGPA(float averageGPA) {
@@ -129,6 +154,6 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course:" + id;
+        return "Course:" + courseId;
     }
 }

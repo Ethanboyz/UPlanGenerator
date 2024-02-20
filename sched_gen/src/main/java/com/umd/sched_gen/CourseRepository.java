@@ -4,9 +4,12 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface CourseRepository extends CrudRepository<Course, String> {
-    List<Course> findByDepartment(String department);
+public interface CourseRepository extends CrudRepository<Course, UUID> {
+    List<Course> findByDeptId(String deptId);
+    List<Course> findByCourseId(String courseId);
+    List<Course> findByName(String name);
 
-    Optional<Course> findById(String id);
+    Optional<Course> findById(UUID courseId);
 }
