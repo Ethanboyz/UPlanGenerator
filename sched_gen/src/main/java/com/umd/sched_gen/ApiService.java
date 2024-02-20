@@ -18,7 +18,7 @@ public class ApiService {
     }
 
     public List<Course> fetchCourses() {
-        String apiUrl = "https://api.umd.io/v1/courses";
+        String apiUrl = "https://api.umd.io/v1/courses/list";
         ResponseEntity<List<Course>> response = restTemplate.exchange(
                 apiUrl,
                 HttpMethod.GET,
