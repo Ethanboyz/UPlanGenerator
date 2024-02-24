@@ -1,4 +1,4 @@
-package com.umd.sched_gen;
+package com.umd.sched_gen.Courses;
 
 import org.springframework.data.repository.CrudRepository;
 
