@@ -1,8 +1,10 @@
 package com.umd.sched_gen;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import com.umd.sched_gen.Courses.Course;
+import com.umd.sched_gen.Courses.CourseRepository;
 
 import java.util.List;
 
@@ -11,7 +13,6 @@ public class DataInitializer implements CommandLineRunner {
     private final ApiService apiService;
     private final CourseRepository courseRepository;
 
-    @Autowired
     public DataInitializer(ApiService apiService, CourseRepository courseRepository) {
         this.apiService = apiService;
         this.courseRepository = courseRepository;
@@ -19,7 +20,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<Course> courses = apiService.fetchCourses();
+        List<Course> courses = apiService.fetchAllCourses();
         courseRepository.saveAll(courses);
     }
 }
