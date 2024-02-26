@@ -1,21 +1,20 @@
 
 package com.umd.sched_gen.Courses;
 
-import java.util.UUID;
-
-import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "courses", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"Course"})
+})
 public class Course {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", updatable = false, nullable = false)
-    private UUID id;
+    private int id;
 
     /* Identifying factors of a course */
     @Column(name = "Course")
@@ -47,12 +46,12 @@ public class Course {
     protected Course() {}
 
     /* Only info needed to retrieve a course's info is its id */
-    public Course(UUID id) {
+    public Course(int id) {
         this.id = id;
     }
 
     /* Getters */
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
@@ -98,7 +97,7 @@ public class Course {
     } */
 
     /* Setters */
-    public void setId(UUID id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -149,7 +148,7 @@ public class Course {
             return false;
         }
         Course course = (Course)o;
-        return id.equals(course.id);
+        return id == course.id;
     }
 
     @Override
