@@ -5,6 +5,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -46,10 +47,18 @@ public class ApiService {
             if (courses != null && !courses.isEmpty()) {
                 allCourses.addAll(courses);
             } else {
-                break;
+                break;   // Break the loop when there are no more courses
             }
+
             } catch (Exception e) {
-                System.out.println("API GET request failed!");
+                System.out.println("API GET request failed! Retrying...");
+            }
+
+            // No API rate limits, but slow down anyway
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException t) {
+                System.out.println("Interrupted thread");
             }
         } while (true);
 
