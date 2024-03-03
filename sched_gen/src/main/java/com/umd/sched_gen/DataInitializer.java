@@ -22,8 +22,13 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<Course> courses = apiService.fetchAllCourses();
+        if (courseRepository.count() == 0) {
+            List<Course> courses = apiService.fetchAllCourses();
+            saveCourses(courses);
+        }
+    }
 
+    private void saveCourses(List<Course> courses) {
         // Save courses one at a time to database, ensure none are duplicates
         for (Course course : courses) {
             try {
