@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<Course, Integer> {
-    List<Course> findByDeptId(String deptId);
     List<Course> findByCourseId(String courseId);
+    List<Course> findByDeptId(String deptId);
     List<Course> findByName(String name);
 
     Optional<Course> findById(int Id);
