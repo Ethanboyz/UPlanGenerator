@@ -29,7 +29,9 @@ public class Course {
     private String deptId;
 
     /* info about the course */
-    /*private float averageGPA; */
+    @Column(name = "Average GPA")
+    @JsonProperty("average_gpa")
+    private float averageGPA;
 
     /* 
     private List<Course> prerequisites;
@@ -67,9 +69,9 @@ public class Course {
         return deptId;
     }
 
-    /*public float getAverageGPA() {
+    public float getAverageGPA() {
         return averageGPA;
-    } */
+    }
 
     /*
     public List<Course> getPrerequisites() {    
@@ -113,9 +115,9 @@ public class Course {
         this.deptId = deptId;
     }
 
-    /* public void setAverageGPA(float averageGPA) {
+    public void setAverageGPA(float averageGPA) {
         this.averageGPA = averageGPA;
-    } */
+    }
 
     /*
     public void setPrerequisites(List<Course> prerequisites) {
@@ -148,7 +150,7 @@ public class Course {
             return false;
         }
         Course course = (Course)o;
-        return id == course.id;
+        return courseId.equals(course.getCourseId());
     }
 
     @Override
