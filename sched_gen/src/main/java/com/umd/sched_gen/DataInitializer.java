@@ -28,14 +28,13 @@ public class DataInitializer implements CommandLineRunner {
             saveCourses(courses);
         }
     }
-
+    // Save courses one at a time to database, ensuring none are duplicates
     private void saveCourses(List<Course> courses) {
-        // Save courses one at a time to database, ensure none are duplicates
         for (Course course : courses) {
             try {
                 courseRepository.save(course);
             } catch (DataIntegrityViolationException d) {
-                System.out.println("Duplicate course not added: " + course.getCourseId());
+                System.out.println("Course not added: " + course.getCourseId() + ", possible duplicate?");
             } catch (Exception e) {
                 System.out.println("Failed to save course " + course.getCourseId() + " to database");
             }
