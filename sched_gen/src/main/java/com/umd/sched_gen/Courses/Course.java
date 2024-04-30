@@ -72,7 +72,7 @@ public class Course {
     } */
 
     /*
-    public List<Course> getPrerequisites() {
+    public List<Course> getPrerequisites() {    
         return new ArrayList<>(prerequisites);
     }
 

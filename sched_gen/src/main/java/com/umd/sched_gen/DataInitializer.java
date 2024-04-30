@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 
+/* Exists solely to populate and update the database, when needed */
 @Component
 public class DataInitializer implements CommandLineRunner {
     private final ApiService apiService;
