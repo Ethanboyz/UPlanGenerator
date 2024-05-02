@@ -1,13 +1,13 @@
-
 package com.umd.sched_gen.Courses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "courses", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"Course"})
+    @UniqueConstraint(columnNames = {"Course", "Course Name"})
 })
 public class Course {
 
@@ -28,7 +28,15 @@ public class Course {
     @JsonProperty("dept_id")
     private String deptId;
 
-    /* info about the course */
+    /* Info about the course */
+    @Column(name = "Credits")
+    @JsonProperty("credits")
+    private int credits;
+
+    @Column(name = "Gen Eds")
+    @JsonProperty("geneds")
+    private List<List<String>> geneds;
+    
     @Column(name = "Average GPA")
     @JsonProperty("average_gpa")
     private float averageGPA;
@@ -68,6 +76,12 @@ public class Course {
     public String getDeptId() {
         return deptId;
     }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    /* Input getter for geneds here */
 
     public float getAverageGPA() {
         return averageGPA;
@@ -114,6 +128,12 @@ public class Course {
     public void setDeptId(String deptId) {
         this.deptId = deptId;
     }
+
+    public void setCredits(int credits) {
+        this.credits = credits;
+    }
+
+    /* Input setter for geneds here */
 
     public void setAverageGPA(float averageGPA) {
         this.averageGPA = averageGPA;
