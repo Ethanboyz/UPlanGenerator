@@ -63,9 +63,21 @@ public class Course {
     private float averageGPA;
 
     /* Relationships this course may have with others (like prereqs) */
-    @Column(name = "Relationships")
-    @JsonProperty("relationships")
-    private Relationships relationships;
+    @Column(name = "Prerequisites")
+    @JsonProperty("relationships.prereqs")
+    private String prereqs;
+
+    @Column(name = "Corequisites")
+    @JsonProperty("relationships.coreqs")
+    private String coreqs;
+
+    @Column(name = "Restrictions")
+    @JsonProperty("relationships.restrictions")
+    private String restrictions;
+
+    @Column(name = "Credit Granted For")
+    @JsonProperty("relationships.credit_granted_for")
+    private String creditGrantedFor;
 
     /* Default constructor needed */
     protected Course() {}
@@ -119,8 +131,20 @@ public class Course {
         return averageGPA;
     }
 
-    public Relationships getRelationships() {
-        return new Relationships(relationships);
+    public String getPrereqs() {
+        return prereqs;
+    }
+
+    public String getCoreqs() {
+        return coreqs;
+    }
+
+    public String getRestrictions() {
+        return restrictions;
+    }
+
+    public String getCreditGrantedFor() {
+        return creditGrantedFor;
     }
 
     /* Setters */
@@ -168,8 +192,20 @@ public class Course {
         this.averageGPA = averageGPA;
     }
 
-    public void setRelationships(Relationships relationships) {
-        this.relationships = new Relationships(relationships);
+    public void setPrereqs(String prereqs) {
+        this.prereqs = prereqs;
+    }
+
+    public void setCoreqs(String coreqs) {
+        this.coreqs = coreqs;
+    }
+
+    public void setRestrictions(String restrictions) {
+        this.restrictions = restrictions;
+    }
+
+    public void setCreditGrantedFor(String creditGrantedFor) {
+        this.creditGrantedFor = creditGrantedFor;
     }
 
     @Override
