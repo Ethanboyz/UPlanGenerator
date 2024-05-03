@@ -1,9 +1,13 @@
 package com.umd.sched_gen.Courses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "courses", uniqueConstraints = {
@@ -16,14 +20,17 @@ public class Course {
     @Column(name = "ID", updatable = false, nullable = false)
     private int id;
 
-    /* Identifying factors of a course */
+    /* The course code primarily used for identification (4 letters followed by 3 numbers and an
+     * optional alphanumeric) */
     @Column(name = "Course")
     @JsonProperty("course_id")
     private String courseId;
 
+    /* The full name of the course (eg: Advanced Data Structures) */
     @Column(name = "Course Name")
     private String name;
 
+    /* The 4 letter code of the department (eg: CMSC, ENGL) */
     @Column(name = "Department")
     @JsonProperty("dept_id")
     private String deptId;
@@ -33,31 +40,62 @@ public class Course {
     @JsonProperty("credits")
     private int credits;
 
+    /* Which semesters of the year is the course usually taught */
+    @Column(name = "Semesters")
+    ArrayList<String> semesters;
+
+    /* Length of semesters list */
+    @Column(name = "# of Semesters")
+    private int numSemesters;
+
+    /* Strings representing the General Education requirements the course fulfills. Note that this
+     * is an array of arrays of strings. The outmost "layer" represents "or", while the inner one
+     * represents an and relationship. Additionally, if a gen ed credit is granted only when taken
+     * with another class, this will be represented using a pipe (|) with that class name.
+     * 
+     * For instance, "X, Y or Z (if taken with C)" will be returned as [[X, Y], [Z|C]] here.
+     * AOSC200 is also a good example course of this. */
     @Column(name = "Gen Eds")
-    @JsonProperty("geneds")
+    @JsonProperty("gen_ed")
     private List<List<String>> geneds;
     
+    /* Average GPA data from planetterp */
     @Column(name = "Average GPA")
     @JsonProperty("average_gpa")
     private float averageGPA;
 
-    /* 
-    private List<Course> prerequisites;
-    private List<Course> corequisites; */
+    /* Relationships this course may have with others (like prereqs) */
+    @Column(name = "Prerequisites")
+    @JsonProperty("prereqs")
+    private String prereqs;
 
-    /* Separation of semesters for the sake of DB columns */
-    /*
-    private boolean fall;
-    private boolean winter;
-    private boolean spring;
-    private boolean summer; */
+    @Column(name = "Corequisites")
+    @JsonProperty("coreqs")
+    private String coreqs;
 
-    /* Default constructor for sake of Spring Data JPA */
+    @Column(name = "Restrictions")
+    @JsonProperty("restrictions")
+    private String restrictions;
+
+    @Column(name = "Credit Granted For")
+    @JsonProperty("credit_granted_for")
+    private String creditGrantedFor;
+
+    /* Default constructor needed */
     protected Course() {}
 
     /* Only info needed to retrieve a course's info is its id */
     public Course(int id) {
         this.id = id;
+    }
+
+    /* Handle nested JSON structure */
+    @JsonSetter("relationships")
+    public void setRelationships(Map<String, Object> relationships) {
+        this.coreqs = (String) relationships.get("coreqs");
+        this.prereqs = (String) relationships.get("prereqs");
+        this.restrictions = (String) relationships.get("restrictions");
+        this.creditGrantedFor = (String) relationships.get("credit_granted_for");
     }
 
     /* Getters */
@@ -81,36 +119,44 @@ public class Course {
         return credits;
     }
 
-    /* Input getter for geneds here */
+    public ArrayList<String> getSemesters() {
+        return new ArrayList<>(semesters);
+    }
+
+    public int getNumSemesters() {
+        return numSemesters;
+    }
+
+    public List<List<String>> getGeneds() {
+        if (geneds == null) {
+            return null;
+        }
+        List<List<String>> copy = new ArrayList<>();
+        for (List<String> sublist : geneds) {
+            copy.add(new ArrayList<>(sublist));
+        }
+        return copy;
+    }
 
     public float getAverageGPA() {
         return averageGPA;
     }
 
-    /*
-    public List<Course> getPrerequisites() {    
-        return new ArrayList<>(prerequisites);
+    public String getPrereqs() {
+        return prereqs;
     }
 
-    public List<Course> getCorequisites() {
-        return new ArrayList<>(corequisites);
-    } */
-
-    /*public boolean getFall() {
-        return fall;
+    public String getCoreqs() {
+        return coreqs;
     }
 
-    public boolean getWinter() {
-        return winter;
+    public String getRestrictions() {
+        return restrictions;
     }
 
-    public boolean getSpring() {
-        return spring;
+    public String getCreditGrantedFor() {
+        return creditGrantedFor;
     }
-
-    public boolean getSummer() {
-        return summer;
-    } */
 
     /* Setters */
     public void setId(int id) {
@@ -133,36 +179,45 @@ public class Course {
         this.credits = credits;
     }
 
-    /* Input setter for geneds here */
+    public void setSemesters(ArrayList<String> semesters) {
+        this.semesters = new ArrayList<>(semesters);
+    }
+
+    public void setNumSemesters(int numSemesters) {
+        this.numSemesters = numSemesters;
+    }
+    
+    public void setGeneds(List<List<String>> genEd) {
+        if (genEd == null) {
+            this.geneds = null;
+        } else {
+            List<List<String>> copy = new ArrayList<>();
+            for (List<String> sublist : genEd) {
+                copy.add(new ArrayList<>(sublist)); // Deep copying each sublist
+            }
+            this.geneds = copy;
+        }
+    }
 
     public void setAverageGPA(float averageGPA) {
         this.averageGPA = averageGPA;
     }
 
-    /*
-    public void setPrerequisites(List<Course> prerequisites) {
-        this.prerequisites = new ArrayList<>(prerequisites);
+    public void setPrereqs(String prereqs) {
+        this.prereqs = prereqs;
     }
 
-    public void setCorequisites(List<Course> corequisites) {
-        this.corequisites = new ArrayList<>(corequisites);
-    } */
-
-    /* public void setFall(boolean fall) {
-        this.fall = fall;
+    public void setCoreqs(String coreqs) {
+        this.coreqs = coreqs;
     }
 
-    public void setWinter(boolean winter) {
-        this.winter = winter;
+    public void setRestrictions(String restrictions) {
+        this.restrictions = restrictions;
     }
 
-    public void setSpring(boolean spring) {
-        this.spring = spring;
+    public void setCreditGrantedFor(String creditGrantedFor) {
+        this.creditGrantedFor = creditGrantedFor;
     }
-
-    public void setSummer(boolean summer) {
-        this.summer = summer;
-    } */
 
     @Override
     public boolean equals(Object o) {
