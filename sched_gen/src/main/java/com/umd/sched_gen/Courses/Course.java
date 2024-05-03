@@ -1,11 +1,13 @@
 package com.umd.sched_gen.Courses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "courses", uniqueConstraints = {
@@ -64,19 +66,19 @@ public class Course {
 
     /* Relationships this course may have with others (like prereqs) */
     @Column(name = "Prerequisites")
-    @JsonProperty("relationships.prereqs")
+    @JsonProperty("prereqs")
     private String prereqs;
 
     @Column(name = "Corequisites")
-    @JsonProperty("relationships.coreqs")
+    @JsonProperty("coreqs")
     private String coreqs;
 
     @Column(name = "Restrictions")
-    @JsonProperty("relationships.restrictions")
+    @JsonProperty("restrictions")
     private String restrictions;
 
     @Column(name = "Credit Granted For")
-    @JsonProperty("relationships.credit_granted_for")
+    @JsonProperty("credit_granted_for")
     private String creditGrantedFor;
 
     /* Default constructor needed */
@@ -85,6 +87,15 @@ public class Course {
     /* Only info needed to retrieve a course's info is its id */
     public Course(int id) {
         this.id = id;
+    }
+
+    /* Handle nested JSON structure */
+    @JsonSetter("relationships")
+    public void setRelationships(Map<String, Object> relationships) {
+        this.coreqs = (String) relationships.get("coreqs");
+        this.prereqs = (String) relationships.get("prereqs");
+        this.restrictions = (String) relationships.get("restrictions");
+        this.creditGrantedFor = (String) relationships.get("credit_granted_for");
     }
 
     /* Getters */
