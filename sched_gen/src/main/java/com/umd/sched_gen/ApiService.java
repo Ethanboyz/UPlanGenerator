@@ -14,7 +14,6 @@ import com.umd.sched_gen.Courses.Course;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.time.Year;
@@ -25,9 +24,10 @@ public class ApiService {
     private final String COURSES_API_MINIFIED = "https://api.umd.io/v1/courses/list";
     private final int COURSES_PER_PAGE = 100;   /* Up to 100 */
     private final String GRADES_API = "https://planetterp.com/api/v1/course";
-    private final int RETRIEVAL_RATE = 100;       /* Up to 1000 */
+    private final int RETRIEVAL_RATE = 10;       /* Up to 1000 */
     private final RestTemplate restTemplate;
 
+    /* Colors for some nice printing! */
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_GREEN = "\u001B[32m";
@@ -62,7 +62,7 @@ public class ApiService {
                 /* Build the request for umd.io */
                 String courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API)
                     .queryParam("page", page++)
-                    .queryParam("per_page", COURSES_PER_PAGE)
+                    .queryParam("per_page", Math.min(COURSES_PER_PAGE, 100))
                     .queryParam("semester", possibleSemester)
                     .toUriString();
                 /* Fetch course data from API(s) */
@@ -79,7 +79,7 @@ public class ApiService {
                         fetchedCourses = refineCourses(fetchedCourses, allCourses, semesterCourses);
                         allCourses.addAll(fetchedCourses);
                     } else {
-                        break;   /* Break the nested loop when there are no more courses */
+                        break;   /* Move on to next semester when no more courses for current one */
                     }
                 /* Error handling umd.io courses info error */
                 } catch (RestClientException e) {
