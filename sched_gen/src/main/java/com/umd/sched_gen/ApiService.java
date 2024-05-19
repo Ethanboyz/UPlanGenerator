@@ -167,22 +167,22 @@ public class ApiService {
         ArrayList<String> result = new ArrayList<>();
         if (semesterCourses.get(0).contains(course)) {
             result.add("FALL");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in FALL" + ANSI_RESET);
         }
         if (semesterCourses.get(1).contains(course)) {
             result.add("WINTER");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in WINTER" + ANSI_RESET);
         }
         if (semesterCourses.get(2).contains(course)) {
             result.add("SPRING");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SPRING" + ANSI_RESET);
         }
         if (semesterCourses.get(3).contains(course)) {
             result.add("SUMMER");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SUMMER" + ANSI_RESET);
         }
         return result;
