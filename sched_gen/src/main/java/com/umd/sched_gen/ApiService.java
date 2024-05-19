@@ -22,9 +22,10 @@ import java.time.Year;
 @Service
 public class ApiService {
     private final String COURSES_API = "https://api.umd.io/v1/courses";
-    private final int COURSES_PER_PAGE = 100;
+    private final String COURSES_API_MINIFIED = "https://api.umd.io/v1/courses/list";
+    private final int COURSES_PER_PAGE = 100;   /* Up to 100 */
     private final String GRADES_API = "https://planetterp.com/api/v1/course";
-    private final int RETRIEVAL_RATE = 5;       /* Up to 1000 */
+    private final int RETRIEVAL_RATE = 100;       /* Up to 1000 */
     private final RestTemplate restTemplate;
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -43,65 +44,85 @@ public class ApiService {
         List<Course> allCourses = new ArrayList<>();
         int page = 1;
 
-        do {    /* umd.io returns paginated list of courses, must traverse through pages */
-            /* Build the request for umd.io */
-            String courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API)
-                .queryParam("page", page++)
-                .queryParam("per_page", COURSES_PER_PAGE)
-                .toUriString();
-            /* Fetch course data from API(s) */
-            try {
-                ResponseEntity<List<Course>> response = restTemplate.exchange(
-                courseUri,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Course>>() {});
-                
-                /* Process the response and add to list. Do this one page at a time */
-                List<Course> fetchedCourses = response.getBody();
-                if (fetchedCourses != null && !fetchedCourses.isEmpty()) {
-                    fetchedCourses = refineCourses(fetchedCourses);
-                    allCourses.addAll(fetchedCourses);
-                } else {
-                    break;   /* Break the loop when there are no more courses */
-                }
-            /* Error handling umd.io courses info error */
-            } catch (RestClientException e) {
-                System.out.println(ANSI_RED + "[ERROR]: API GET request failed! "
-                                + courseUri + ANSI_RESET);
-            }
+        ArrayList<String> possibleSemesters = new ArrayList<>();
+        int year = Year.now().getValue() - 1;
+        ArrayList<List<Course>> semesterCourses = fetchSemesterDataHelper(year);
+        String yearStr = String.valueOf(year);
+        
+        /* Each semester is associated with a year and a two digit number representing month */
+        possibleSemesters.add(yearStr + "08");  /* Fall */
+        possibleSemesters.add(yearStr + "12");  /* Winter */
+        possibleSemesters.add(yearStr + "01");  /* Spring */
+        possibleSemesters.add(yearStr + "05");  /* Summer */
 
-            // No API rate limits, but slow down anyway because we're nice :3
-            try {
-                Thread.sleep(Math.max((1000 / RETRIEVAL_RATE), 1));
-            } catch (InterruptedException t) {
-                System.out.println(ANSI_RED + "[ERROR]: Interrupted thread" + ANSI_RESET);
-            }
-        } while (true);
+        for (String possibleSemester : possibleSemesters) {
+            System.out.println(ANSI_YELLOW + "[NOTICE]: Now processing semester " + possibleSemester
+                                + ANSI_RESET);
+            do {    /* umd.io returns paginated list of courses, must traverse through pages */
+                /* Build the request for umd.io */
+                String courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API)
+                    .queryParam("page", page++)
+                    .queryParam("per_page", COURSES_PER_PAGE)
+                    .queryParam("semester", possibleSemester)
+                    .toUriString();
+                /* Fetch course data from API(s) */
+                try {
+                    ResponseEntity<List<Course>> response = restTemplate.exchange(
+                    courseUri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Course>>() {});
+                    
+                    /* Process the response and add to list. Do this one page at a time */
+                    List<Course> fetchedCourses = response.getBody();
+                    if (fetchedCourses != null && !fetchedCourses.isEmpty()) {
+                        fetchedCourses = refineCourses(fetchedCourses, allCourses, semesterCourses);
+                        allCourses.addAll(fetchedCourses);
+                    } else {
+                        break;   /* Break the nested loop when there are no more courses */
+                    }
+                /* Error handling umd.io courses info error */
+                } catch (RestClientException e) {
+                    System.out.println(ANSI_RED + "[ERROR]: API GET request failed! "
+                                    + courseUri + ANSI_RESET);
+                }
+    
+                // No API rate limits, but slow down anyway because we're nice :3
+                try {
+                    Thread.sleep(Math.max((1000 / RETRIEVAL_RATE), 1));
+                } catch (InterruptedException t) {
+                    System.out.println(ANSI_RED + "[ERROR]: Interrupted thread" + ANSI_RESET);
+                }
+            } while (true);
+        }
 
         return allCourses;  /* Should contain all courses and all their data */
     }
 
-    /* Processing courses after fetching from umd.io */
-    private List<Course> refineCourses(List<Course> courses) {
+    /* Processing courses after fetching from umd.io only if they aren't duplicates from allCourses */
+    private List<Course> refineCourses(List<Course> courses, List<Course> allCourses, List<List<Course>> semesterCourses) {
         ArrayList<Course> toBeRemoved = new ArrayList<>();
         for (Course course : courses) {
+            /* Will not process duplicate courses */
+            if (allCourses.contains(course)) {
+                System.out.println(ANSI_YELLOW + "[NOTICE]: " + course.getCourseId()
+                                + " is a duplicate! Will remove..." + ANSI_RESET);
+                toBeRemoved.add(course);
+                continue;
+            };
             /* Filter grad-level courses from the DB (maybe this will change in the future?) */
             Pattern pattern = Pattern.compile("[A-Z]{4}[0-4]\\d{2}[0-9A-Z]?");
             Matcher matcher = pattern.matcher(course.getCourseId());
             if (matcher.find()) {
                 /* Fetch average GPA for each remaining course and semesters taught data */
                 course.setAverageGPA(fetchGradesData(course));
-                ArrayList<String> semestersTaught = fetchSemesterData(course);
+                ArrayList<String> semestersTaught = fetchSemesterData(course, semesterCourses);
                 course.setSemesters(semestersTaught);
                 course.setNumSemesters(semestersTaught.size());
-                System.out.println(ANSI_CYAN + "[DEBUG]: " + course.getCourseId()
-                                + " has\n\tPrereqs: " + course.getPrereqs() + "\n\tCoreqs: "
-                                + course.getCoreqs() + ANSI_RESET);
             } else {
                 toBeRemoved.add(course);
                 System.out.println(ANSI_YELLOW + "[NOTICE]: " + course.getCourseId()
-                                + " is not undergrad level! Removing..." + ANSI_RESET);
+                                + " is not undergrad level! Will remove..." + ANSI_RESET);
             }
         }
         courses.removeAll(toBeRemoved);
@@ -138,82 +159,92 @@ public class ApiService {
     }
 
     /* Fetches semester data for a course, returning which semesters it is likely to be taught */
-    private ArrayList<String> fetchSemesterData(Course course) {
-        int year = Year.now().getValue() - 1;
-        ArrayList<String> attempt1 = fetchSemesterDataHelper(course, year);
-        ArrayList<String> attempt2 = fetchSemesterDataHelper(course, ++year);
-
+    private ArrayList<String> fetchSemesterData(Course course, List<List<Course>> semesterCourses) {
         /* Using two attempts across two recent years for best results I think?
-         * Look I know it's goofy but such cases where 1 year is not enough do exist.
-         * 2 years should suffice, more would be unnecessary.
+         * For now, we will evaluate the semesters in which a course is taken using the data
+         * of one year.
         */
         ArrayList<String> result = new ArrayList<>();
-        if (attempt1.contains("FALL") | attempt2.contains("FALL")) {
+        if (semesterCourses.get(0).contains(course)) {
             result.add("FALL");
-            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in FALL" + ANSI_RESET);
         }
-        if (attempt1.contains("WINTER") | attempt2.contains("WINTER")) {
+        if (semesterCourses.get(1).contains(course)) {
             result.add("WINTER");
-            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in WINTER" + ANSI_RESET);
         }
-        if (attempt1.contains("SPRING") | attempt2.contains("SPRING")) {
+        if (semesterCourses.get(2).contains(course)) {
             result.add("SPRING");
-            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SPRING" + ANSI_RESET);
         }
-        if (attempt1.contains("SUMMER") | attempt2.contains("SUMMER")) {
+        if (semesterCourses.get(3).contains(course)) {
             result.add("SUMMER");
-            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SUMMER" + ANSI_RESET);
         }
         return result;
     }
 
-    /* Helper function that retrieves semester data from umd.io for a course for a given year */
-    private ArrayList<String> fetchSemesterDataHelper(Course course, int year) {
-        ArrayList<String> fetchedSemesters = new ArrayList<>();
-        HashMap<String, String> possibleSemesters = new HashMap<>();
+    /* Helper function that constructs a list of courses per semester from umd.io for a given year */
+    private ArrayList<List<Course>> fetchSemesterDataHelper(int year) {
+        ArrayList<List<Course>> semesterCourses = new ArrayList<>();
         String yearStr = String.valueOf(year);
         
         /* Each semester is associated with a year and a two digit number representing month */
-        possibleSemesters.put(yearStr + "08", "FALL");
-        possibleSemesters.put(yearStr + "12", "WINTER");
-        possibleSemesters.put(yearStr + "01", "SPRING");
-        possibleSemesters.put(yearStr + "05", "SUMMER");
-        String courseId = course.getCourseId();
+        String fall = yearStr + "08";
+        String winter = yearStr + "12";
+        String spring = yearStr + "01";
+        String summer = yearStr + "05";
+
+        List<Course> fallCourses;
+        List<Course> winterCourses;
+        List<Course> springCourses;
+        List<Course> summerCourses;
         
         try {
-            possibleSemesters.forEach((possibleSemester, semesterWordForm) -> {
-                String courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API + "/" + courseId)
-                    .queryParam("semester", possibleSemester)
-                    .toUriString();
-                try {
-                    restTemplate.exchange(
-                    courseUri,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<List<Course>>() {});
-                    fetchedSemesters.add(semesterWordForm);
-                /* HTTP 4XX error when semester for that course does not exist */
-                } catch (HttpClientErrorException d) {
-                    /* Class is not taught during the semester, nothing to worry about */
-                }
+            String courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API_MINIFIED)
+                .queryParam("semester", fall)
+                .toUriString();
+            ResponseEntity<List<Course>> response = restTemplate.exchange(
+            courseUri, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<Course>>() {});
+            fallCourses = response.getBody();
 
-                try {
-                    Thread.sleep(Math.max((1000 / RETRIEVAL_RATE), 1));
-                } catch (InterruptedException t) {
-                    System.out.println(ANSI_RED + "[ERROR]: Interrupted thread" + ANSI_RESET);
-                }
-            });
+            courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API_MINIFIED)
+                .queryParam("semester", winter)
+                .toUriString();
+            response = restTemplate.exchange(courseUri, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<Course>>() {});
+            winterCourses = response.getBody();
+
+            courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API_MINIFIED)
+                .queryParam("semester", spring)
+                .toUriString();
+            response = restTemplate.exchange(courseUri, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<Course>>() {});
+            springCourses = response.getBody();
+
+            courseUri = UriComponentsBuilder.fromHttpUrl(COURSES_API_MINIFIED)
+                .queryParam("semester", summer)
+                .toUriString();
+            response = restTemplate.exchange(courseUri, HttpMethod.GET, null,
+            new ParameterizedTypeReference<List<Course>>() {});
+            summerCourses = response.getBody();
+
         /* Error handling GET response retrieval error */
         } catch (RestClientException e) {
             System.out.println(ANSI_RED + "[ERROR]: Could not retrieve semester data\n"
-                            + "for course " + courseId + "\n"
+                            + "for semesters\n"
                             + "RestClientException: " + e.getMessage() + ANSI_RESET);
-            return new ArrayList<String>(); // Likely better to return empty if failure occurs
+            return new ArrayList<List<Course>>(); // Likely better to return empty if failure occurs
         }
-        return fetchedSemesters;
+        semesterCourses.add(fallCourses);
+        semesterCourses.add(winterCourses);
+        semesterCourses.add(springCourses);
+        semesterCourses.add(summerCourses);
+        return semesterCourses;
     }
 }

@@ -64,21 +64,19 @@ public class Course {
     @JsonProperty("average_gpa")
     private float averageGPA;
 
-    /* Relationships this course may have with others (like prereqs) */
+    /* Relationships this course may have with others (like prereqs). These will be obtained via
+     * web scraping, unlike the others which are obtained via API GETs.
+    */
     @Column(name = "Prerequisites")
-    @JsonProperty("prereqs")
     private String prereqs;
 
     @Column(name = "Corequisites")
-    @JsonProperty("coreqs")
     private String coreqs;
 
     @Column(name = "Restrictions")
-    @JsonProperty("restrictions")
     private String restrictions;
 
     @Column(name = "Credit Granted For")
-    @JsonProperty("credit_granted_for")
     private String creditGrantedFor;
 
     /* Default constructor needed */
@@ -87,15 +85,6 @@ public class Course {
     /* Only info needed to retrieve a course's info is its id */
     public Course(int id) {
         this.id = id;
-    }
-
-    /* Handle nested JSON structure */
-    @JsonSetter("relationships")
-    public void setRelationships(Map<String, Object> relationships) {
-        this.coreqs = (String) relationships.get("coreqs");
-        this.prereqs = (String) relationships.get("prereqs");
-        this.restrictions = (String) relationships.get("restrictions");
-        this.creditGrantedFor = (String) relationships.get("credit_granted_for");
     }
 
     /* Getters */
