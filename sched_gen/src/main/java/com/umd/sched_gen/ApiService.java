@@ -42,7 +42,6 @@ public class ApiService {
      * Additionally fetches grades from planetterp.com. Use to populate the database. */
     public List<Course> fetchAllCourses() {
         List<Course> allCourses = new ArrayList<>();
-        int page = 1;
 
         ArrayList<String> possibleSemesters = new ArrayList<>();
         int year = Year.now().getValue() - 1;
@@ -56,6 +55,7 @@ public class ApiService {
         possibleSemesters.add(yearStr + "05");  /* Summer */
 
         for (String possibleSemester : possibleSemesters) {
+            int page = 1;
             System.out.println(ANSI_YELLOW + "[NOTICE]: Now processing semester " + possibleSemester
                                 + ANSI_RESET);
             do {    /* umd.io returns paginated list of courses, must traverse through pages */
@@ -167,22 +167,22 @@ public class ApiService {
         ArrayList<String> result = new ArrayList<>();
         if (semesterCourses.get(0).contains(course)) {
             result.add("FALL");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in FALL" + ANSI_RESET);
         }
         if (semesterCourses.get(1).contains(course)) {
             result.add("WINTER");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in WINTER" + ANSI_RESET);
         }
         if (semesterCourses.get(2).contains(course)) {
             result.add("SPRING");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SPRING" + ANSI_RESET);
         }
         if (semesterCourses.get(3).contains(course)) {
             result.add("SUMMER");
-            System.out.print(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
+            System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SUMMER" + ANSI_RESET);
         }
         return result;
