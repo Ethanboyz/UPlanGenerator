@@ -42,7 +42,6 @@ public class ApiService {
      * Additionally fetches grades from planetterp.com. Use to populate the database. */
     public List<Course> fetchAllCourses() {
         List<Course> allCourses = new ArrayList<>();
-        int page = 1;
 
         ArrayList<String> possibleSemesters = new ArrayList<>();
         int year = Year.now().getValue() - 1;
@@ -56,6 +55,7 @@ public class ApiService {
         possibleSemesters.add(yearStr + "05");  /* Summer */
 
         for (String possibleSemester : possibleSemesters) {
+            int page = 1;
             System.out.println(ANSI_YELLOW + "[NOTICE]: Now processing semester " + possibleSemester
                                 + ANSI_RESET);
             do {    /* umd.io returns paginated list of courses, must traverse through pages */
