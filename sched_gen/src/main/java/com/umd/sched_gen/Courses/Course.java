@@ -1,13 +1,11 @@
 package com.umd.sched_gen.Courses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "courses", uniqueConstraints = {
@@ -68,10 +66,10 @@ public class Course {
      * web scraping, unlike the others which are obtained via API GETs.
     */
     @Column(name = "Prerequisites")
-    private String prereqs;
+    private String prereqs;     /* Courses that must be taken before this course */
 
     @Column(name = "Corequisites")
-    private String coreqs;
+    private String coreqs;      /* Courses that can (and must) be taken before or alongside this course */
 
     @Column(name = "Restrictions")
     private String restrictions;

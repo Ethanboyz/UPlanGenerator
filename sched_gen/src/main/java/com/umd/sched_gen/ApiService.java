@@ -19,13 +19,15 @@ import java.util.regex.Pattern;
 import java.time.Year;
 
 @Service
+/* Service that manages all API-related operations primarily to extract course data. */
 public class ApiService {
     private final String COURSES_API = "https://api.umd.io/v1/courses";
     private final String COURSES_API_MINIFIED = "https://api.umd.io/v1/courses/list";
     private final int COURSES_PER_PAGE = 100;   /* Up to 100 */
     private final String GRADES_API = "https://planetterp.com/api/v1/course";
-    private final int RETRIEVAL_RATE = 10;       /* Up to 1000 */
+    private final int RETRIEVAL_RATE = 5;       /* Up to 1000 */
     private final RestTemplate restTemplate;
+    private int YEAR = Year.now().getValue() - 1;
 
     /* Colors for some nice printing! */
     public static final String ANSI_RESET = "\u001B[0m";
@@ -44,9 +46,8 @@ public class ApiService {
         List<Course> allCourses = new ArrayList<>();
 
         ArrayList<String> possibleSemesters = new ArrayList<>();
-        int year = Year.now().getValue() - 1;
-        ArrayList<List<Course>> semesterCourses = fetchSemesterDataHelper(year);
-        String yearStr = String.valueOf(year);
+        ArrayList<List<Course>> semesterCourses = fetchSemesterDataHelper();
+        String yearStr = String.valueOf(YEAR);
         
         /* Each semester is associated with a year and a two digit number representing month */
         possibleSemesters.add(yearStr + "08");  /* Fall */
@@ -160,28 +161,29 @@ public class ApiService {
 
     /* Fetches semester data for a course, returning which semesters it is likely to be taught */
     private ArrayList<String> fetchSemesterData(Course course, List<List<Course>> semesterCourses) {
+        String yearStr = String.valueOf(YEAR);
         /* Using two attempts across two recent years for best results I think?
          * For now, we will evaluate the semesters in which a course is taken using the data
          * of one year.
         */
         ArrayList<String> result = new ArrayList<>();
         if (semesterCourses.get(0).contains(course)) {
-            result.add("FALL");
+            result.add(yearStr + "08");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in FALL" + ANSI_RESET);
         }
         if (semesterCourses.get(1).contains(course)) {
-            result.add("WINTER");
+            result.add(yearStr + "12");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in WINTER" + ANSI_RESET);
         }
         if (semesterCourses.get(2).contains(course)) {
-            result.add("SPRING");
+            result.add(yearStr + "01");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SPRING" + ANSI_RESET);
         }
         if (semesterCourses.get(3).contains(course)) {
-            result.add("SUMMER");
+            result.add(yearStr + "05");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SUMMER" + ANSI_RESET);
         }
@@ -189,9 +191,9 @@ public class ApiService {
     }
 
     /* Helper function that constructs a list of courses per semester from umd.io for a given year */
-    private ArrayList<List<Course>> fetchSemesterDataHelper(int year) {
+    private ArrayList<List<Course>> fetchSemesterDataHelper() {
         ArrayList<List<Course>> semesterCourses = new ArrayList<>();
-        String yearStr = String.valueOf(year);
+        String yearStr = String.valueOf(YEAR);
         
         /* Each semester is associated with a year and a two digit number representing month */
         String fall = yearStr + "08";

@@ -16,6 +16,9 @@ public class DataInitializer implements CommandLineRunner {
     private final ApiService apiService;
     private final CourseRepository courseRepository;
 
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+
     public DataInitializer(ApiService apiService, CourseRepository courseRepository) {
         this.apiService = apiService;
         this.courseRepository = courseRepository;
@@ -34,9 +37,11 @@ public class DataInitializer implements CommandLineRunner {
             try {
                 courseRepository.save(course);
             } catch (DataIntegrityViolationException d) {
-                System.out.println("Course not added: " + course.getCourseId() + ", possible duplicate?");
+                System.out.println(ANSI_RED + "Course not added: " + course.getCourseId() + 
+                                    ", possible duplicate?" + ANSI_RESET);
             } catch (Exception e) {
-                System.out.println("Failed to save course " + course.getCourseId() + " to database");
+                System.out.println(ANSI_RED + "Failed to save course " + course.getCourseId() + 
+                                    " to database" + ANSI_RESET);
             }
         }
     }
