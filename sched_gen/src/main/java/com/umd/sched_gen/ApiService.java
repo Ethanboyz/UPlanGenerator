@@ -106,8 +106,8 @@ public class ApiService {
         for (Course course : courses) {
             /* Will not process duplicate courses */
             if (allCourses.contains(course)) {
-                System.out.println(ANSI_YELLOW + "[NOTICE]: " + course.getCourseId()
-                                + " is a duplicate! Will remove..." + ANSI_RESET);
+                System.out.println(ANSI_YELLOW + "[NOTICE]: Cannot add " + course.getCourseId()
+                                + " (already been added)!" + ANSI_RESET);
                 toBeRemoved.add(course);
                 continue;
             };
@@ -122,8 +122,8 @@ public class ApiService {
                 course.setNumSemesters(semestersTaught.size());
             } else {
                 toBeRemoved.add(course);
-                System.out.println(ANSI_YELLOW + "[NOTICE]: " + course.getCourseId()
-                                + " is not undergrad level! Will remove..." + ANSI_RESET);
+                System.out.println(ANSI_YELLOW + "[NOTICE]: Cannot add " + course.getCourseId()
+                                + " (not undergrad level)!" + ANSI_RESET);
             }
         }
         courses.removeAll(toBeRemoved);
@@ -168,22 +168,22 @@ public class ApiService {
         */
         ArrayList<String> result = new ArrayList<>();
         if (semesterCourses.get(0).contains(course)) {
-            result.add(yearStr + "08");
+            result.add("FALL");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in FALL" + ANSI_RESET);
         }
         if (semesterCourses.get(1).contains(course)) {
-            result.add(yearStr + "12");
+            result.add("WINTER");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in WINTER" + ANSI_RESET);
         }
         if (semesterCourses.get(2).contains(course)) {
-            result.add(yearStr + "01");
+            result.add("SPRING");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SPRING" + ANSI_RESET);
         }
         if (semesterCourses.get(3).contains(course)) {
-            result.add(yearStr + "05");
+            result.add("SUMMER");
             System.out.println(ANSI_GREEN + "[SEMESTERS]: " + course.getCourseId()
                             + " taught in SUMMER" + ANSI_RESET);
         }
