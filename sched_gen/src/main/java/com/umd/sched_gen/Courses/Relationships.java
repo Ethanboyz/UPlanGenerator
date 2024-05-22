@@ -5,29 +5,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.List;
 
-@Entity
-@Table(name = "relationships", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {})
-})
+@Embeddable
 /* Creating a table for relationships. Should be paired with courses from the courses table
  * to show the prerequisites, corequisites, restrictions, and other relationships with other
  * courses.
  */
 public class Relationships {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", updatable = false, nullable = false)
-    private int id;
-
-    /* List of course prerequisites */
-    @Column(name = "Prereqs")
+    /* Retrieved course prerequisites as a string description */
+    @Transient
     @JsonProperty("prereqs")
+    @OneToMany(mappedBy = "relationships")
+    private String prereqsString;
+
+    /* Retrieved course corequisites as a string description */
+    @Transient
+    @JsonProperty("coreqs")
+    @OneToMany(mappedBy = "relationships")
+    private String coreqsString;
+    
+    /* List of course prerequisites (formatted) */
+    @Column(name = "Prereqs")
     private List<Course> prerequisites;
 
-    /* List of course corequisites */
+    /* List of course corequisites (formatted) */
     @Column(name = "Coreqs")
-    @JsonProperty("coreqs")
     private List<Course> corequisites;
 
     /* String description of course restrictions */
@@ -50,6 +52,14 @@ public class Relationships {
     protected Relationships() {}
 
     /* Getters */
+    public String getPrereqsString() {
+        return prereqsString;
+    }
+
+    public String getCoreqsString() {
+        return coreqsString;
+    }
+
     public List<Course> getPrerequisites() {
         return prerequisites;
     }
@@ -67,6 +77,14 @@ public class Relationships {
     }
 
     /* Setters */
+    public void setPrereqsString(String prereqsString) {
+        this.prereqsString = prereqsString;
+    }
+
+    public void setCoreqsString(String coreqsString) {
+        this.coreqsString = coreqsString;
+    }
+
     public void setPrerequisites(List<Course> prerequisites) {
         this.prerequisites = prerequisites;
     }

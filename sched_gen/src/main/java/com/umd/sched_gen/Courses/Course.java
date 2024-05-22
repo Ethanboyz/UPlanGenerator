@@ -63,6 +63,7 @@ public class Course {
     private float averageGPA;
 
     /* Relationships this course may have with others (like prereqs). */
+    @Embedded
     @Column(name = "Relationships")
     @JsonProperty("relationships")
     private Relationships relationships;
