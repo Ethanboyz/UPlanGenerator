@@ -120,6 +120,11 @@ public class ApiService {
                 ArrayList<String> semestersTaught = fetchSemesterData(course, semesterCourses);
                 course.setSemesters(semestersTaught);
                 course.setNumSemesters(semestersTaught.size());
+                System.out.println(ANSI_CYAN + "[DEBUG]: course " + course.getCourseId() + "\n"
+                                    + "Prereqs: " + course.getPrereqs() + "\n"
+                                    + "Coreqs: " + course.getCoreqs() + "\n"
+                                    + "Restrictions: " + course.getRestrictions() + "\n"
+                                    + "Credits granted for: " + course.getCreditGrantedFor());
             } else {
                 toBeRemoved.add(course);
                 System.out.println(ANSI_YELLOW + "[NOTICE]: Cannot add " + course.getCourseId()

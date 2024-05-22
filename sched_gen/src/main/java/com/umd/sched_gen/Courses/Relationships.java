@@ -1,111 +1,67 @@
 package com.umd.sched_gen.Courses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.*;
-import java.util.List;
-
-@Embeddable
 /* Creating a table for relationships. Should be paired with courses from the courses table
  * to show the prerequisites, corequisites, restrictions, and other relationships with other
  * courses.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Relationships {
 
     /* Retrieved course prerequisites as a string description */
-    @Transient
-    @JsonProperty("prereqs")
-    @OneToMany(mappedBy = "relationships")
-    private String prereqsString;
+    private String prereqs;
 
     /* Retrieved course corequisites as a string description */
-    @Transient
-    @JsonProperty("coreqs")
-    @OneToMany(mappedBy = "relationships")
-    private String coreqsString;
-    
-    /* List of course prerequisites (formatted) */
-    @Column(name = "Prereqs")
-    private List<Course> prerequisites;
-
-    /* List of course corequisites (formatted) */
-    @Column(name = "Coreqs")
-    private List<Course> corequisites;
+    private String coreqs;
 
     /* String description of course restrictions */
-    @Column(name = "Restrictions")
-    @JsonProperty("coreqs")
     private String restrictions;
 
     /* String description of credits for what additional courses this course may fulfill */
-    @Column(name = "Credit Granted For")
-    @JsonProperty("credit_granted_for")
-    private String credit_granted_for;
-
-    public Relationships(Relationships relationship) {
-        this.prerequisites = relationship.getPrerequisites();
-        this.corequisites = relationship.getCorequisites();
-        this.restrictions = relationship.getRestrictions();
-        this.credit_granted_for = relationship.getCredit_granted_for();
-    }
-
-    protected Relationships() {}
+    private String creditGrantedFor;
 
     /* Getters */
-    public String getPrereqsString() {
-        return prereqsString;
+
+    public String getPrerequisites() {
+        return prereqs;
     }
 
-    public String getCoreqsString() {
-        return coreqsString;
-    }
-
-    public List<Course> getPrerequisites() {
-        return prerequisites;
-    }
-
-    public List<Course> getCorequisites() {
-        return corequisites;
+    public String getCorequisites() {
+        return coreqs;
     }
 
     public String getRestrictions() {
         return restrictions;
     }
 
-    public String getCredit_granted_for() {
-        return credit_granted_for;
+    public String getCreditGrantedFor() {
+        return creditGrantedFor;
     }
 
     /* Setters */
-    public void setPrereqsString(String prereqsString) {
-        this.prereqsString = prereqsString;
+
+    public void setPrerequisites(String prereqs) {
+        this.prereqs = prereqs;
     }
 
-    public void setCoreqsString(String coreqsString) {
-        this.coreqsString = coreqsString;
-    }
-
-    public void setPrerequisites(List<Course> prerequisites) {
-        this.prerequisites = prerequisites;
-    }
-
-    public void setCorequisites(List<Course> corequisites) {
-        this.corequisites = corequisites;
+    public void setCorequisites(String coreqs) {
+        this.coreqs = coreqs;
     }
 
     public void setRestrictions(String restrictions) {
         this.restrictions = restrictions;
     }
 
-    public void setCredit_granted_for(String credit_granted_for) {
-        this.credit_granted_for = credit_granted_for;
+    public void setCreditGrantedFor(String creditGrantedFor) {
+        this.creditGrantedFor = creditGrantedFor;
     }
 
     @Override
     public String toString() {
-        return "Prerequisites: " + prerequisites.toString() + "\n"
-                + "Corequisites: " + corequisites.toString() + "\n"
+        return "Prerequisites: " + prereqs.toString() + "\n"
+                + "Corequisites: " + coreqs.toString() + "\n"
                 + "Restrictions: " + restrictions + "\n"
-                + "Credit granted for: " + credit_granted_for;
+                + "Credit granted for: " + creditGrantedFor;
     }
 }

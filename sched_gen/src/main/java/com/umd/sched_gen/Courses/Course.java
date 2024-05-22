@@ -63,10 +63,10 @@ public class Course {
     private float averageGPA;
 
     /* Relationships this course may have with others (like prereqs). */
-    @Embedded
-    @Column(name = "Relationships")
-    @JsonProperty("relationships")
-    private Relationships relationships;
+    private String prerequisites;
+    private String corequisites;
+    private String restrictions;
+    private String creditGrantedFor;
 
     /* Default constructor needed */
     protected Course() {}
@@ -120,23 +120,31 @@ public class Course {
         return averageGPA;
     }
 
-    public List<Course> getPrereqs() {
-        return new ArrayList<> (relationships.getPrerequisites());
+    public String getPrereqs() {
+        return prerequisites;
     }
 
-    public List<Course> getCoreqs() {
-        return new ArrayList<> (relationships.getCorequisites());
+    public String getCoreqs() {
+        return corequisites;
     }
 
     public String getRestrictions() {
-        return relationships.getRestrictions();
+        return restrictions;
     }
 
     public String getCreditGrantedFor() {
-        return relationships.getCredit_granted_for();
+        return creditGrantedFor;
     }
 
     /* Setters */
+    @JsonProperty("relationships")
+    public void setRelationships(Relationships relationships) {
+        this.prerequisites = relationships.getPrerequisites();
+        this.corequisites = relationships.getCorequisites();
+        this.restrictions = relationships.getRestrictions();
+        this.creditGrantedFor = relationships.getCreditGrantedFor();
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -181,20 +189,20 @@ public class Course {
         this.averageGPA = averageGPA;
     }
 
-    public void setPrereqs(List<Course> prereqs) {
-        this.relationships.setPrerequisites(prereqs);
+    public void setPrereqs(String prerequisites) {
+        this.prerequisites = prerequisites;
     }
 
-    public void setCoreqs(List<Course> coreqs) {
-        this.relationships.setPrerequisites(coreqs);
+    public void setCoreqs(String corequisites) {
+        this.corequisites = corequisites;
     }
 
     public void setRestrictions(String restrictions) {
-        this.relationships.setRestrictions(restrictions);
+        this.restrictions = restrictions;
     }
 
     public void setCreditGrantedFor(String creditGrantedFor) {
-        this.relationships.setCredit_granted_for(creditGrantedFor);
+        this.creditGrantedFor = creditGrantedFor;
     }
 
     @Override
