@@ -1,4 +1,4 @@
-package com.umd.sched_gen;
+package com.umd.sched_gen.DataInitializer;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,8 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.time.Year;
 
+/** This service manages all API operations to extract and refine course data for storage. */
 @Service
-/* Service that manages all API-related operations primarily to extract course data. */
 public class ApiService {
     private final String COURSES_API = "https://api.umd.io/v1/courses";
     private final String COURSES_API_MINIFIED = "https://api.umd.io/v1/courses/list";
@@ -27,7 +27,7 @@ public class ApiService {
     private final String GRADES_API = "https://planetterp.com/api/v1/course";
     private final int RETRIEVAL_RATE = 5;       /* Up to 1000 */
     private final RestTemplate restTemplate;
-    private int YEAR = Year.now().getValue() - 1;
+    private int PREV_YEAR = Year.now().getValue() - 1;
 
     /* Colors for some nice printing! */
     public static final String ANSI_RESET = "\u001B[0m";
@@ -40,14 +40,16 @@ public class ApiService {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    /* Fetch all courses from umd.io, returning a list of all courses.
-     * Additionally fetches grades from planetterp.com. Use to populate the database. */
+    /** Fetch all Courses data from umd.io and planetterp.com. Use to populate the database.
+     * 
+     * @return a list of all undergraduate UMD courses to add to database.
+    */
     public List<Course> fetchAllCourses() {
         List<Course> allCourses = new ArrayList<>();
 
         ArrayList<String> possibleSemesters = new ArrayList<>();
-        ArrayList<List<Course>> semesterCourses = fetchSemesterDataHelper();
-        String yearStr = String.valueOf(YEAR);
+        ArrayList<List<Course>> semesterCourses = coursesPerSemester();
+        String yearStr = String.valueOf(PREV_YEAR);
         
         /* Each semester is associated with a year and a two digit number representing month */
         possibleSemesters.add(yearStr + "08");  /* Fall */
@@ -100,7 +102,16 @@ public class ApiService {
         return allCourses;  /* Should contain all courses and all their data */
     }
 
-    /* Processing courses after fetching from umd.io only if they aren't duplicates from allCourses */
+    /** Processing Courses after fetching from umd.io only if they aren't duplicates from allCourses
+     * 
+     * @param courses the list of Courses to refine
+     * @param allCourses some Courses will not be returned if they are included in allCourses to prevent
+     * duplicates
+     * @param semesterCourses contains a list of lists of Courses representing each semester of the
+     * year previous to the current one, starting from the fall to the summer
+     * (ie: fall 2023 - summer 2023), and which courses are offered during each semester.
+     * @return a list of refined Courses.
+    */
     private List<Course> refineCourses(List<Course> courses, List<Course> allCourses, List<List<Course>> semesterCourses) {
         ArrayList<Course> toBeRemoved = new ArrayList<>();
         for (Course course : courses) {
@@ -119,10 +130,9 @@ public class ApiService {
                 course.setAverageGPA(fetchGradesData(course));
                 ArrayList<String> semestersTaught = fetchSemesterData(course, semesterCourses);
                 course.setSemesters(semestersTaught);
-                course.setNumSemesters(semestersTaught.size());
                 System.out.println(ANSI_CYAN + "[DEBUG]: course " + course.getCourseId() + "\n"
-                                    + "Prereqs: " + course.getPrereqs() + "\n"
-                                    + "Coreqs: " + course.getCoreqs() + "\n"
+                                    + "Prereqs: " + course.getPrereqsString() + "\n"
+                                    + "Coreqs: " + course.getCoreqsString() + "\n"
                                     + "Restrictions: " + course.getRestrictions() + "\n"
                                     + "Credits granted for: " + course.getCreditGrantedFor());
             } else {
@@ -135,7 +145,10 @@ public class ApiService {
         return courses;
     }
 
-    /* Retrieves grades data from planetterp.com for a course. Used in refineCourses() */
+    /** Retrieves average GPA data from planetterp.com for a Course.
+     * @param course the Course to fetch grades data for
+     * @return the average GPA of the Course
+    */
     private float fetchGradesData(Course course) {
         String courseUri = UriComponentsBuilder.fromHttpUrl(GRADES_API)
             .queryParam("name", course.getCourseId())
@@ -164,9 +177,15 @@ public class ApiService {
         }
     }
 
-    /* Fetches semester data for a course, returning which semesters it is likely to be taught */
+    /** Fetches semester data for a Course, returning which semesters it is likely to be taught.
+     * 
+     * @param course the Course to fetch semester data for
+     * @param semesterCourses contains a list of lists of Courses representing each semester of the
+     * year previous to the current one, starting from the fall to the summer
+     * (ie: fall 2023 - summer 2023), and which courses are offered during each semester.
+     * @return a list of all semesters the Course is likely to be offered in
+    */
     private ArrayList<String> fetchSemesterData(Course course, List<List<Course>> semesterCourses) {
-        String yearStr = String.valueOf(YEAR);
         /* Using two attempts across two recent years for best results I think?
          * For now, we will evaluate the semesters in which a course is taken using the data
          * of one year.
@@ -195,10 +214,16 @@ public class ApiService {
         return result;
     }
 
-    /* Helper function that constructs a list of courses per semester from umd.io for a given year */
-    private ArrayList<List<Course>> fetchSemesterDataHelper() {
+    /** Constructs a list of Courses per semester from umd.io for a given year and aggregates the
+     * lists into one.
+     * 
+     * @return a list of lists of Courses representing each semester of the
+     * year previous to the current one, starting from the fall to the summer
+     * (ie: fall 2023 - summer 2023), and which courses are offered during each semester.
+     */
+    private ArrayList<List<Course>> coursesPerSemester() {
         ArrayList<List<Course>> semesterCourses = new ArrayList<>();
-        String yearStr = String.valueOf(YEAR);
+        String yearStr = String.valueOf(PREV_YEAR);
         
         /* Each semester is associated with a year and a two digit number representing month */
         String fall = yearStr + "08";

@@ -3,9 +3,9 @@ package com.umd.sched_gen.Courses;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/* Creating a table for relationships. Should be paired with courses from the courses table
- * to show the prerequisites, corequisites, restrictions, and other relationships with other
- * courses.
+/** A relationship is a series of fields that hold information of relationships between Courses.
+ * This includes prerequisites, corequisites, and restrictions and are primarily used to enable
+ * the API service to fetch the needed relationship data of Courses.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Relationships {
@@ -27,33 +27,60 @@ public class Relationships {
     private String creditGrantedFor;
 
     /* Getters */
-
+    /** Returns a string description of the prerequisites of the Course
+     * 
+     * @return the string representing the prerequisites
+     */
     public String getprereqs() {
         return prereqs;
     }
 
+    /** Returns a string description of the corequisites of the Course
+     * 
+     * @return the string representing the corequisites
+     */
     public String getcoreqs() {
         return coreqs;
     }
 
+    /** Returns a string description of the special restrictions of the Course
+     * 
+     * @return the string representing the restrictions
+     */
     public String getRestrictions() {
         return restrictions;
     }
 
+    /** Returns a string description of potential other Courses this Course might fulfill when
+     * enrolling it (some Courses may grant credit for both itself and other courses)
+     * 
+     * @return the string representing the credits granted for taking the Course
+     */
     public String getCreditGrantedFor() {
         return creditGrantedFor;
     }
 
     /* Setters */
-
+    /** Sets a string description of the prerequisites of the Course
+     * 
+     * @param prereqs the string representing the new prerequisites
+    */
     public void setprereqs(String prereqs) {
         this.prereqs = prereqs;
     }
 
+    /** Sets a string description of the corequisites of the Course
+     * 
+     * @param coreqs the string representing the new corequisites
+    */
     public void setcoreqs(String coreqs) {
         this.coreqs = coreqs;
     }
 
+    /** Sets a string description of the special restrictions of the Course
+     * 
+     * @param restrictions the string representing the bew restrictions
+     */
     public void setRestrictions(String restrictions) {
         this.restrictions = restrictions;
     }
@@ -62,6 +89,11 @@ public class Relationships {
         this.creditGrantedFor = creditGrantedFor;
     }
 
+    /** Sets a string description of potential other Courses this Course might fulfill when
+     * enrolling it (some Courses may grant credit for both itself and other courses)
+     * 
+     * @param creditGrantedFor the string representing the credits granted for taking the Course
+     */
     @Override
     public String toString() {
         return "Prerequisites: " + prereqs.toString() + "\n"
