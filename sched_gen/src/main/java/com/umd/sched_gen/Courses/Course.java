@@ -76,9 +76,9 @@ public class Course {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "course_prereqs", // Name of the join table
-        joinColumns = @JoinColumn(name = "course_id"), // Column for the current course
-        inverseJoinColumns = @JoinColumn(name = "prerequisite_id") // Column for the prerequisite courses
+        name = "course_prereqs",                                    /* Making a join table */
+        joinColumns = @JoinColumn(name = "course_id"),              /* Column for current course */
+        inverseJoinColumns = @JoinColumn(name = "prerequisite_id")  /* Column for prereqs */
     )
     private List<Course> prereqs;
 
@@ -86,8 +86,8 @@ public class Course {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "course_coreqs", // Similar setup as prerequisites
-        joinColumns = @JoinColumn(name = "course_id"),
+        name = "course_coreqs",                                     /* Similar setup as prereqs */
+        joinColumns = @JoinColumn(name = "course_id"),              /* but for coreqs instead   */
         inverseJoinColumns = @JoinColumn(name = "corequisite_id")
     )
     private List<Course> coreqs;
