@@ -72,10 +72,24 @@ public class Course {
     @JsonProperty("coreqs")
     private String coreqsString;
 
-    /* Formatted prereqs and coreqs */
+    /* Formatted prereqs */
     @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "course_prereqs", // Name of the join table
+        joinColumns = @JoinColumn(name = "course_id"), // Column for the current course
+        inverseJoinColumns = @JoinColumn(name = "prerequisite_id") // Column for the prerequisite courses
+    )
     private List<Course> prereqs;
+
+    /* Formatted coreqs */
     @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "course_coreqs", // Similar setup as prerequisites
+        joinColumns = @JoinColumn(name = "course_id"),
+        inverseJoinColumns = @JoinColumn(name = "corequisite_id")
+    )
     private List<Course> coreqs;
 
     /* Restrictions of enrolling in the course (informational purposes only) */
@@ -294,6 +308,15 @@ public class Course {
     public void setSemesters(ArrayList<String> semesters) {
         this.semesters = new ArrayList<>(semesters);
         this.numSemesters = semesters.size();
+    }
+
+    /** Sets the number of semesters the Course is offered in (effectively the size of the list
+     * returned by {@link #getSemesters()})
+     * 
+     * @param numSemesters the new number of semesters the Course is offered in
+    */
+    public void setNumSemesters(int numSemesters) {
+        this.numSemesters = numSemesters;
     }
     
     /** Sets the geneds fulfilled by the Course. New value should be a list of list of strings.

@@ -1,18 +1,19 @@
 package com.umd.sched_gen.Scheduler;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.lang.NonNull;
+
+import com.umd.sched_gen.DataInitializer.DataInitializedEvent;
 
 @Component
-public class Scheduler implements ApplicationListener<ApplicationReadyEvent> {
+public class Scheduler implements ApplicationListener<DataInitializedEvent> {
 
     /* Explicit dependencies */
     public Scheduler() {}
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        // Once data is loaded, you can start the scheduling part
-        // This might be triggered by user action instead
+    public void onApplicationEvent(@NonNull DataInitializedEvent event) {
+        System.out.println("Success!");
     }
 }
