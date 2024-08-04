@@ -54,8 +54,8 @@ public class DataInitializer implements CommandLineRunner {
             try {
                 courseRepository.save(course);
             } catch (DataIntegrityViolationException d) {
-                System.out.println(ANSI_RED + "Course not added: " + course.getCourseId() + 
-                                    ", possible duplicate?" + ANSI_RESET);
+                System.out.println(ANSI_RED + "Course not added: " + course.getCourseId()
+                                    + ANSI_RESET);
             } catch (Exception e) {
                 System.out.println(ANSI_RED + "Failed to save course " + course.getCourseId() + 
                                     " to database" + ANSI_RESET);
