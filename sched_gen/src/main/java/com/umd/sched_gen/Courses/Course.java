@@ -26,7 +26,7 @@ public class Course {
     private String courseId;
 
     /* The full name of the course (eg: Advanced Data Structures) */
-    @Column(name = "Course Name")
+    @Column(name = "Course Name", columnDefinition = "TEXT")
     private String name;
 
     /* The 4 letter code of the department (eg: CMSC, ENGL) */
@@ -64,12 +64,12 @@ public class Course {
     private float averageGPA;
 
     /* Relationships this course may have with others (like prereqs) */
-    @Transient
     @JsonProperty("prereqs")
+    @Column(columnDefinition = "TEXT")
     private String prereqsString;
 
-    @Transient
     @JsonProperty("coreqs")
+    @Column(columnDefinition = "TEXT")
     private String coreqsString;
 
     /* Formatted prereqs */
@@ -94,6 +94,7 @@ public class Course {
 
     /* Restrictions of enrolling in the course (informational purposes only) */
     @JsonProperty("restrictions")
+    @Column(columnDefinition = "TEXT")
     private String restrictions;
 
     /* Some courses will grant credit for both itself and other courses */

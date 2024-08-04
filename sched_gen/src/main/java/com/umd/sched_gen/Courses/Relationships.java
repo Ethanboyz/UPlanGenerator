@@ -10,21 +10,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Relationships {
 
-    /* Retrieved course prerequisites as a string description */
     @JsonProperty("prereqs")
-    private String prereqs;
-
-    /* Retrieved course corequisites as a string description */
+    private String prereqs;             /* Description of course prerequisites */
     @JsonProperty("coreqs")
-    private String coreqs;
-
-    /* String description of course restrictions */
+    private String coreqs;              /* Description of course corequisites */
     @JsonProperty("restrictions")
-    private String restrictions;
-
-    /* String description of credits for what additional courses this course may fulfill */
+    private String restrictions;        /* Description of course restrictions */
     @JsonProperty("credit_granted_for")
-    private String creditGrantedFor;
+    private String creditGrantedFor;    /* Description of course credits that may be fulfilled */
 
     /* Getters */
     /** Returns a string description of the prerequisites of the Course

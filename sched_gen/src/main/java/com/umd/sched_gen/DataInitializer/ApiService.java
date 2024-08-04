@@ -122,7 +122,7 @@ public class ApiService {
                 toBeRemoved.add(course);
                 continue;
             };
-            /* Filter grad-level courses from the DB (maybe this will change in the future?) */
+            /* Filter GRAD-LEVEL courses from the DB */
             Pattern pattern = Pattern.compile("[A-Z]{4}[0-4]\\d{2}[0-9A-Z]?");
             Matcher matcher = pattern.matcher(course.getCourseId());
             if (matcher.find()) {
