@@ -5,7 +5,11 @@ day of enrollment.
 
 An undergraduate plan generator in development, UPlan Generator primarily works as a persistent UMD course database, where queries for courses can be run where UMD's proprietary services fall short.
 
-For example, finding certain gen-ed courses without any restrictions where anyone can enroll, regardless of obtained years and credits, is a use case available here exclusively.
+For example, finding certain Gen-Ed courses without any restrictions where anyone can enroll, regardless of obtained years and credits, is a use case available here exclusively (that is if you wish to make such a search easily in one go). The results are organized and easily downloadable in a table.
+
+![image](https://github.com/user-attachments/assets/9b62c3ce-e564-4d97-a356-72c20dc1dd96)
+
+The service can also predict the semesters each course is likely to be taught in the next years given previous years of data. No more anxious waiting to see if ENGL142 is going to be available next spring!
 
 ### Development and Setup
 The project is built on top of Java Spring Boot, with Maven as the intended build tool.
